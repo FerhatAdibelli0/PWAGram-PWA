@@ -17,17 +17,17 @@ const STATIC_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
 
-function trimCache(cacheName, maxSize) {
-  caches.open(cacheName).then((cache) => {
-    return cache.keys().then((keys) => {
-      if (keys.length > maxSize) {
-        cache.delete(keys[0]).then(() => {
-          trimCache(cacheName, maxSize);
-        });
-      }
-    });
-  });
-}
+// function trimCache(cacheName, maxSize) {
+//   caches.open(cacheName).then((cache) => {
+//     return cache.keys().then((keys) => {
+//       if (keys.length > maxSize) {
+//         cache.delete(keys[0]).then(() => {
+//           trimCache(cacheName, maxSize);
+//         });
+//       }
+//     });
+//   });
+// }
 
 self.addEventListener('install', (event) => {
   console.log('[serviceWorker] is installed ');
@@ -117,13 +117,14 @@ function isInArray(string, array) {
 
 //? Mix of Cache-then-network strategy-5 and Cache-with-network-fallback strategy-1
 self.addEventListener('fetch', (event) => {
-  const api = 'https://httpbin.org/get';
+  const api =
+    'https://pwagram-5e122-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
   if (event.request.url.indexOf(api) !== -1) {
     //? Cache-then-network strategy-5 (Check cache inside frontend)
     event.respondWith(
       fetch(event.request).then((response) => {
         return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
-          trimCache(CACHE_DYNAMIC_NAME, 3);
+          // trimCache(CACHE_DYNAMIC_NAME, 3);
           cache.put(event.request.url, response.clone());
           return response;
         });
@@ -141,7 +142,7 @@ self.addEventListener('fetch', (event) => {
           return fetch(event.request)
             .then((response) => {
               return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
-                trimCache(CACHE_DYNAMIC_NAME, 4);
+                // trimCache(CACHE_DYNAMIC_NAME, 4);
                 cache.put(event.request.url, response.clone());
                 return response;
               });

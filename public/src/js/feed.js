@@ -58,23 +58,30 @@ function clearCard() {
   }
 }
 
-function createCard() {
+function updateUI(dataArray) {
+  for (let i = 0; i < dataArray.length; i++) {
+    clearCard();
+    createCard(dataArray[i]);
+  }
+}
+
+function createCard(data) {
   var cardWrapper = document.createElement('div');
   cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp';
   var cardTitle = document.createElement('div');
   cardTitle.className = 'mdl-card__title';
-  cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
+  cardTitle.style.backgroundImage = `url("${data.image}")`;
   cardTitle.style.backgroundSize = 'cover';
   cardTitle.style.height = '180px';
   cardWrapper.appendChild(cardTitle);
   var cardTitleTextElement = document.createElement('h2');
   cardTitleTextElement.style.color = 'white';
   cardTitleTextElement.className = 'mdl-card__title-text';
-  cardTitleTextElement.textContent = 'San Francisco Trip';
+  cardTitleTextElement.textContent = data.title;
   cardTitle.appendChild(cardTitleTextElement);
   var cardSupportingText = document.createElement('div');
   cardSupportingText.className = 'mdl-card__supporting-text';
-  cardSupportingText.textContent = 'In San Francisco';
+  cardSupportingText.textContent = data.location;
   cardSupportingText.style.textAlign = 'center';
   // var cardSaveButton = document.createElement('button');
   // cardSaveButton.textContent = 'Save!';
@@ -85,24 +92,21 @@ function createCard() {
   sharedMomentsArea.appendChild(cardWrapper);
 }
 let dataFromWeb = false;
-const api = 'https://httpbin.org/post';
+const api =
+  'https://pwagram-5e122-default-rtdb.europe-west1.firebasedatabase.app/posts.json';
 
-fetch(api, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  body: JSON.stringify({ message: 'Something that is not important.' }),
-})
+fetch(api)
   .then(function (res) {
     return res.json();
   })
   .then(function (data) {
     console.log('From web :', data);
     dataFromWeb = true;
-    clearCard();
-    createCard();
+    const dataArray = [];
+    for (let key in data) {
+      dataArray.push(data[key]);
+    }
+    updateUI(dataArray);
   });
 
 if ('caches' in window) {
@@ -116,8 +120,11 @@ if ('caches' in window) {
     .then((data) => {
       console.log('From caches', data);
       if (!dataFromWeb) {
-        clearCard();
-        createCard();
+        const dataArray = [];
+        for (let key in data) {
+          dataArray.push(data[key]);
+        }
+        updateUI(dataArray);
       }
     });
 }
