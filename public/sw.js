@@ -1,3 +1,6 @@
+importScripts('./src/js/idb.js');
+importScripts('./src/js/utility.js');
+
 const CACHE_STATIC_NAME = 'static-v2';
 const CACHE_DYNAMIC_NAME = 'dynamic-v2';
 const STATIC_ASSETS = [
@@ -6,6 +9,7 @@ const STATIC_ASSETS = [
   '/offline.html',
   '/src/js/app.js',
   '/src/js/feed.js',
+  '/src/js/idb.js',
   '/src/js/promise.js',
   '/src/js/fetch.js',
   '/src/js/material.min.js',
@@ -16,6 +20,12 @@ const STATIC_ASSETS = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
+
+// const dbPromise = idb.open('posts-store', 1, function (db) {
+//   if (!db.objectStoreNames.contains('posts')) {
+//     db.createObjectStore('posts', { keyPath: 'id' });
+//   }
+// });
 
 // function trimCache(cacheName, maxSize) {
 //   caches.open(cacheName).then((cache) => {
@@ -123,11 +133,24 @@ self.addEventListener('fetch', (event) => {
     //? Cache-then-network strategy-5 (Check cache inside frontend)
     event.respondWith(
       fetch(event.request).then((response) => {
-        return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
-          // trimCache(CACHE_DYNAMIC_NAME, 3);
-          cache.put(event.request.url, response.clone());
-          return response;
+        // return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
+        // trimCache(CACHE_DYNAMIC_NAME, 3);
+        // cache.put(event.request.url, response.clone());
+        const clonedResponse = response.clone();
+        clonedResponse.json().then((data) => {
+          for (let key in data) {
+            // dbPromise.then((db) => {
+            //   const transaction = db.transaction('posts', 'readwrite');
+            //   const store = transaction.objectStore('posts');
+            //   console.log(data[key]);
+            //   store.put(data[key]);
+            //   return transaction.complete;
+            // });
+            writeData('posts', data[key]);
+          }
         });
+        return response;
+        // });
       })
     );
   } else if (isInArray(event.request.url, STATIC_ASSETS)) {
