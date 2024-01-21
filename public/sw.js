@@ -137,18 +137,24 @@ self.addEventListener('fetch', (event) => {
         // trimCache(CACHE_DYNAMIC_NAME, 3);
         // cache.put(event.request.url, response.clone());
         const clonedResponse = response.clone();
-        clonedResponse.json().then((data) => {
-          for (let key in data) {
-            // dbPromise.then((db) => {
-            //   const transaction = db.transaction('posts', 'readwrite');
-            //   const store = transaction.objectStore('posts');
-            //   console.log(data[key]);
-            //   store.put(data[key]);
-            //   return transaction.complete;
-            // });
-            writeData('posts', data[key]);
-          }
-        });
+        clearAllData('posts')
+          .then(() => {
+            return clonedResponse.json();
+          })
+          .then((data) => {
+            for (let key in data) {
+              // dbPromise.then((db) => {
+              //   const transaction = db.transaction('posts', 'readwrite');
+              //   const store = transaction.objectStore('posts');
+              //   console.log(data[key]);
+              //   store.put(data[key]);
+              //   return transaction.complete;
+              // });
+              writeData('posts', data[key]).then(() => {
+                deleteItemFromData('posts', key);
+              });
+            }
+          });
         return response;
         // });
       })

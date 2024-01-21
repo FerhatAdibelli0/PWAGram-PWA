@@ -59,8 +59,8 @@ function clearCard() {
 }
 
 function updateUI(dataArray) {
+  clearCard();
   for (let i = 0; i < dataArray.length; i++) {
-    clearCard();
     createCard(dataArray[i]);
   }
 }
@@ -109,22 +109,32 @@ fetch(api)
     updateUI(dataArray);
   });
 
-if ('caches' in window) {
-  caches
-    .match(api)
-    .then((response) => {
-      if (response) {
-        return response.json();
-      }
-    })
-    .then((data) => {
+console.log(window);
+if ('indexedDB' in window) {
+  realAllData('posts').then((data) => {
+    if (!dataFromWeb) {
       console.log('From caches', data);
-      if (!dataFromWeb) {
-        const dataArray = [];
-        for (let key in data) {
-          dataArray.push(data[key]);
-        }
-        updateUI(dataArray);
-      }
-    });
+      updateUI(data);
+    }
+  });
 }
+
+// if ('caches' in window) {
+//   caches
+//     .match(api)
+//     .then((response) => {
+//       if (response) {
+//         return response.json();
+//       }
+//     })
+//     .then((data) => {
+//       console.log('From caches', data);
+//       if (!dataFromWeb) {
+//         const dataArray = [];
+//         for (let key in data) {
+//           dataArray.push(data[key]);
+//         }
+//         updateUI(dataArray);
+//       }
+//     });
+// }
