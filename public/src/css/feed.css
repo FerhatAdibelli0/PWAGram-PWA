@@ -8,6 +8,8 @@
   top: 56px;
   background: white;
   text-align: center;
+  transform: translateY(100vh);
+  transition: transform 0.5s;
   display: none;
 }
 
@@ -28,4 +30,17 @@
 .input-section {
   display: block;
   margin: 10px auto;
+}
+
+#shared-moments {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 600px) {
+  .mdl-card {
+    width: 50%;
+    min-height: none;
+    height: auto;
+  }
 }

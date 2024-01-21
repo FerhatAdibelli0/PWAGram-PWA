@@ -7,6 +7,10 @@ var sharedMomentsArea = document.querySelector('#shared-moments');
 
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
+  setTimeout(() => {
+    createPostArea.style.transform = 'translateY(0)';
+  }, 1);
+
   if (deferredPrompt) {
     deferredPrompt?.prompt();
 
@@ -33,7 +37,10 @@ function openCreatePostModal() {
 }
 
 function closeCreatePostModal() {
-  createPostArea.style.display = 'none';
+  createPostArea.style.transform = 'translateY(100vh)';
+  setTimeout(() => {
+    createPostArea.style.display = 'none';
+  }, 1000);
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
