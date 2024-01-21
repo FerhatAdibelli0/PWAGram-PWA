@@ -4,6 +4,9 @@ var closeCreatePostModalButton = document.querySelector(
   '#close-create-post-modal-btn'
 );
 var sharedMomentsArea = document.querySelector('#shared-moments');
+const form = document.querySelector('form');
+const locationInputValue = document.querySelector('#location');
+const titleInputValue = document.querySelector('#title');
 
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
@@ -71,6 +74,24 @@ function updateUI(dataArray) {
     createCard(dataArray[i]);
   }
 }
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (
+    locationInputValue.value.trim() === '' ||
+    titleInputValue.value.trim() === ''
+  ) {
+    alert('Check your input values');
+    return;
+  }
+  closeCreatePostModal();
+
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then((sw) => {
+      sw.sync.register('sync-new-post');
+    });
+  }
+});
 
 function createCard(data) {
   var cardWrapper = document.createElement('div');
